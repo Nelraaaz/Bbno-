@@ -1,0 +1,52 @@
+#include <DHT.h>
+
+#define DHTPIN 3       // Pin sensor DHT11
+#define DHTTYPE DHT11  // Tipe DHT
+
+#define FLAME_PIN 2
+#define BUZZER_PIN 4
+#define LED_RED 5
+#define LED_GREEN 6
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+  pinMode(FLAME_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+
+  digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(LED_RED, LOW);
+  digitalWrite(LED_GREEN, HIGH);
+}
+
+void loop() {
+  int flame = digitalRead(FLAME_PIN); // LOW = terdeteksi api
+  float suhu = dht.readTemperature();
+
+  if (isnan(suhu)) {
+    Serial.println("Gagal membaca suhu!");
+    return;
+  }
+
+  Serial.print("Suhu: ");
+  Serial.print(suhu);
+  Serial.print(" C, Api: ");
+  Serial.println(flame == LOW ? "TERDETEKSI!" : "AMAN");
+
+  if (flame == LOW || suhu > 50) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_GREEN, HIGH);
+  }
+
+  delay(2000);
+}
