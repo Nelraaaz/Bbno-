@@ -1,6 +1,6 @@
-#define BLYNK_TEMPLATE_ID "TMPLxxxxxxx"         // Ganti dengan milikmu
-#define BLYNK_TEMPLATE_NAME "Sistem Kebakaran"  // Ganti dengan milikmu
-#define BLYNK_AUTH_TOKEN "YourAuthToken"        // Ganti dengan milikmu
+#define BLYNK_TEMPLATE_ID "TMPL6PGPI92_v"
+#define BLYNK_TEMPLATE_NAME "UAP"
+#define BLYNK_AUTH_TOKEN "C6N-YWNfqNHM7-n1_vw9qOH0jRTx3gD"
 
 #define BLYNK_PRINT Serial
 #include <ESP8266WiFi.h>
@@ -15,30 +15,30 @@ DHT dht(DHTPIN, DHTTYPE);
 // Flame sensor config
 #define FLAME_PIN 4        // D2 di NodeMCU
 
-char ssid[] = "NAMA_WIFI";      // Ganti
-char pass[] = "PASSWORD_WIFI";  // Ganti
+char ssid[] = "NAMA_WIFI";       // <--- Ganti dengan WiFi kamu
+char pass[] = "PASSWORD_WIFI";   // <--- Ganti juga
 
 BlynkTimer timer;
 
 void sendSensorData() {
   float suhu = dht.readTemperature();
-  int flame = digitalRead(FLAME_PIN); // LOW = terdeteksi api
+  int flame = digitalRead(FLAME_PIN); // LOW = api terdeteksi
 
   if (isnan(suhu)) {
     Serial.println("Gagal membaca suhu!");
     return;
   }
 
-  Serial.print("Suhu: "); Serial.print(suhu); Serial.println(" C");
+  Serial.print("Suhu: "); Serial.print(suhu); Serial.println(" °C");
   Serial.print("Api: "); Serial.println(flame == LOW ? "TERDETEKSI" : "AMAN");
 
   // Kirim data ke Blynk
   Blynk.virtualWrite(V0, suhu);
-  Blynk.virtualWrite(V1, flame == LOW ? 255 : 0); // LED: ON jika 255
+  Blynk.virtualWrite(V1, flame == LOW ? 255 : 0);
 
-  // Kirim notifikasi jika kondisi bahaya
+  // Kirim notifikasi jika bahaya
   if (flame == LOW || suhu > 50) {
-    Blynk.logEvent("kebakaran", "⚠️ SUHU TINGGI TERDETEKSI!");
+    Blynk.logEvent("kebakaran", "⚠️ API atau SUHU TINGGI TERDETEKSI!");
   }
 }
 
@@ -48,7 +48,7 @@ void setup() {
   pinMode(FLAME_PIN, INPUT);
 
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
-  timer.setInterval(2000L, sendSensorData); // Setiap 2 detik
+  timer.setInterval(2000L, sendSensorData); // tiap 2 detik
 }
 
 void loop() {
