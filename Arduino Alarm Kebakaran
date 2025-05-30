@@ -1,0 +1,64 @@
+#include <DHT.h> // Library untuk sensor DHT
+
+#define DHTPIN 2    // Pin data DHT11 terhubung
+#define DHTTYPE DHT11 // Tipe sensor: DHT11
+
+#define BUZZER 3    // Pin buzzer terhubung
+#define LED_PIN 4   // Pin LED terhubung
+
+DHT dht(DHTPIN, DHTTYPE); // Inisialisasi objek DHT
+
+void setup() {
+  Serial.begin(9600); // Mulai komunikasi serial
+  dht.begin();        // Mulai sensor DHT
+
+  pinMode(BUZZER, OUTPUT); // Atur pin buzzer sebagai output
+  pinMode(LED_PIN, OUTPUT); // Atur pin LED sebagai output
+
+  Serial.println("Sistem Siaga Api Dimulai!"); // Pesan awal di Serial Monitor
+}
+
+void loop() {
+  float temp = dht.readTemperature(); // Baca suhu dari sensor
+
+  // Cek jika pembacaan sensor gagal
+  if (isnan(temp)) {
+    Serial.println("Sensor error! Tidak dapat membaca suhu.");
+    noTone(BUZZER);         // Pastikan buzzer mati
+    digitalWrite(LED_PIN, LOW); // Pastikan LED mati
+    delay(2000); // Beri jeda lebih lama jika error
+    return; // Keluar dari loop dan coba lagi
+  }
+
+  // Tampilkan suhu di Serial Monitor
+  Serial.print("Suhu: ");
+  Serial.print(temp);
+  Serial.print("C - Status: ");
+
+  // Logika peringatan berdasarkan suhu
+  if (temp > 32) {
+    digitalWrite(LED_PIN, HIGH); // Nyalakan LED
+    Serial.println("KEBAKARAN!!!"); // Tampilkan status di Serial Monitor
+    // Bunyikan buzzer secara berulang sebagai alarm bahaya
+    for (int i = 0; i < 5; i++) {
+      tone(BUZZER, 1000); // Nada pertama
+      delay(250);
+      tone(BUZZER, 1500); // Nada kedua
+      delay(250);
+    }
+    noTone(BUZZER); // Matikan buzzer setelah alarm
+  } else if (temp > 26) {
+    digitalWrite(LED_PIN, LOW); // Matikan LED
+    Serial.println("WASPADA"); // Tampilkan status di Serial Monitor
+    // Bunyikan buzzer sekali sebagai peringatan
+    tone(BUZZER, 1000);
+    delay(500);
+    noTone(BUZZER);
+  } else {
+    digitalWrite(LED_PIN, LOW); // Matikan LED
+    noTone(BUZZER); // Pastikan buzzer mati
+    Serial.println("AMAN"); // Tampilkan status di Serial Monitor
+  }
+
+  delay(1000); // Jeda 1 detik sebelum pembacaan berikutnya
+}
