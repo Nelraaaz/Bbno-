@@ -1,0 +1,57 @@
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT22
+
+#define BUZZER 3
+#define LED_PIN 4
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+  pinMode(BUZZER, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  digitalWrite(BUZZER, LOW);
+  digitalWrite(LED_PIN, LOW);
+}
+
+void loop() {
+  float temp = dht.readTemperature();
+
+  if (isnan(temp)) {
+    Serial.println("Gagal membaca dari sensor DHT!");
+    return;
+  }
+
+  Serial.print("Suhu: ");
+  Serial.print(temp);
+  Serial.println(" *C");
+
+  if (temp > 32) {
+    Serial.println("BAHAYA API!!!");
+    digitalWrite(LED_PIN, HIGH);
+    for (int i = 0; i < 5; i++) {
+      tone(BUZZER, 1000);
+      delay(250);
+      tone(BUZZER, 1500);
+      delay(250);
+    }
+    noTone(BUZZER);
+  } else if (temp > 26) {
+    Serial.println("AWAS");
+    digitalWrite(LED_PIN, LOW);
+    tone(BUZZER, 1000);
+    delay(500);
+    noTone(BUZZER);
+  } else {
+    Serial.println("AMAN");
+    digitalWrite(LED_PIN, LOW);
+    noTone(BUZZER);
+  }
+
+  delay(1000);
+}
