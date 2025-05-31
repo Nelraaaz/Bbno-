@@ -8,12 +8,12 @@
 #include <DHT.h>
 
 // DHT config
-#define DHTPIN 2           // D4 di NodeMCU
+#define DHTPIN D4           // D4 di NodeMCU
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
 // Flame sensor config
-#define FLAME_PIN 4        // D2 di NodeMCU
+#define FLAME_PIN D2        // D2 di NodeMCU
 
 char ssid[] = "NAMA_WIFI";       // <--- Ganti dengan WiFi kamu
 char pass[] = "PASSWORD_WIFI";   // <--- Ganti juga
